@@ -3,8 +3,9 @@ require('dotenv').config();
 
 // Database configuration for Railway.app and local development
 const getDatabaseConfig = () => {
-  // Railway.app production environment
-  if (process.env.RAILWAY_ENVIRONMENT === 'production' || process.env.NODE_ENV === 'production') {
+  // Always use Railway.app configuration when RAILWAY_DB_URL is available
+  if (process.env.RAILWAY_DB_URL) {
+    console.log('🚆 Using Railway.app database URL');
     return {
       host: process.env.DB_HOST || 'shuttle.proxy.rlwy.net',
       port: process.env.DB_PORT || 35740,
@@ -20,10 +21,10 @@ const getDatabaseConfig = () => {
         idle: 10000
       },
       dialectOptions: {
-        ssl: process.env.RAILWAY_ENVIRONMENT === 'production' ? {
+        ssl: {
           require: true,
           rejectUnauthorized: false
-        } : false
+        }
       }
     };
   }
