@@ -9,7 +9,8 @@
     "build": "echo 'Frontend build process would go here'",
     "test": "jest",
     "auto-push": "node auto-push.js",
-    "save-and-push": "git add . && git commit -m \"Manual update\" && git push origin main"
+    "save-and-push": "git add . && git commit -m \"Manual update\" && git push origin main",
+    "watch": "node watcher.js"
   },
   "keywords": ["transport", "vehicle", "management", "university", "nit"],
   "author": "NIT University Dar es Salaam",
