@@ -71,10 +71,11 @@ class ErrorHandler {
     // Show user-friendly message
     this.showUserError(error);
     
+    // Temporarily disable error reporting to prevent continuous error messages
     // Report error if in production
-    if (window.location.hostname !== 'localhost') {
-      this.reportError(error);
-    }
+    // if (window.location.hostname !== 'localhost') {
+    //   this.reportError(error);
+    // }
   }
 
   // Log error to console with details
@@ -101,16 +102,25 @@ class ErrorHandler {
 
   // Show user-friendly error messages
   showUserError(error) {
-    const userMessage = this.getUserFriendlyMessage(error);
-    const toast = this.createToast(userMessage, this.getToastType(error));
-    document.body.appendChild(toast);
-    
-    // Auto-remove toast after 5 seconds
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
+    try {
+      const userMessage = this.getUserFriendlyMessage(error);
+      const toast = this.createToast(userMessage, this.getToastType(error));
+      
+      if (toast) {
+        document.body.appendChild(toast);
+        
+        // Auto-remove toast after 5 seconds
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 5000);
       }
-    }, 5000);
+    } catch (error) {
+      console.error('Failed to show user error:', error);
+      // Fallback to console if toast fails
+      console.error('User Error:', error.message);
+    }
   }
 
   // Get user-friendly error message
@@ -162,28 +172,35 @@ class ErrorHandler {
 
   // Create toast notification
   createToast(message, type = 'error') {
-    const toast = document.createElement('div');
-    toast.className = `toast-notification toast-${type}`;
-    
-    const icons = {
-      error: '❌',
-      warning: '⚠️',
-      success: '✅',
-      info: 'ℹ️'
-    };
+    try {
+      const toast = document.createElement('div');
+      toast.className = `toast-notification toast-${type}`;
+      
+      const icons = {
+        error: '❌',
+        warning: '⚠️',
+        success: '✅',
+        info: 'ℹ️'
+      };
 
-    toast.innerHTML = `
-      <div class="toast-content">
-        <span class="toast-icon">${icons[type] || icons.info}</span>
-        <span class="toast-message">${message}</span>
-        <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
-      </div>
-    `;
+      toast.innerHTML = `
+        <div class="toast-content">
+          <span class="toast-icon">${icons[type] || icons.info}</span>
+          <span class="toast-message">${message}</span>
+          <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+      `;
 
-    // Add styles if not already added
-    this.addToastStyles();
+      // Add styles if not already added
+      this.addToastStyles();
 
-    return toast;
+      return toast;
+    } catch (error) {
+      console.error('Failed to create toast:', error);
+      // Fallback to alert if toast creation fails
+      alert(`${type.toUpperCase()}: ${message}`);
+      return null;
+    }
   }
 
   // Add toast styles to document
@@ -327,26 +344,40 @@ class ErrorHandler {
 
   // Show success message
   showSuccess(message) {
-    const toast = this.createToast(message, 'success');
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
+    try {
+      const toast = this.createToast(message, 'success');
+      if (toast) {
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 3000);
       }
-    }, 3000);
+    } catch (error) {
+      console.error('Failed to show success message:', error);
+      console.log('Success:', message);
+    }
   }
 
   // Show info message
   showInfo(message) {
-    const toast = this.createToast(message, 'info');
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
+    try {
+      const toast = this.createToast(message, 'info');
+      if (toast) {
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 4000);
       }
-    }, 4000);
+    } catch (error) {
+      console.error('Failed to show info message:', error);
+      console.log('Info:', message);
+    }
   }
 }
 
