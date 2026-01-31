@@ -93,10 +93,11 @@ router.get('/', validateDateRange, async (req, res) => {
   }
 });
 
-// Get maintenance record by ID
-router.get('/:id', authenticateToken, validateId, async (req, res) => {
+// Get maintenance record by ID (no authentication required)
+router.get('/:id', validateId, async (req, res) => {
   try {
     const { id } = req.params;
+    const pool = await getPool();
     
     const [records] = await pool.execute(`
       SELECT mr.*, 
@@ -126,12 +127,8 @@ router.get('/:id', authenticateToken, validateId, async (req, res) => {
   }
 });
 
-// Create new maintenance record
-router.post('/', 
-  authenticateToken, 
-  authorizeRoles('admin', 'manager'), 
-  validateMaintenance, 
-  async (req, res) => {
+// Create maintenance record (no authentication required)
+router.post('/', validateMaintenance, async (req, res) => {
     try {
       const {
         vehicle_id,
@@ -201,13 +198,8 @@ router.post('/',
   }
 );
 
-// Update maintenance record
-router.put('/:id', 
-  authenticateToken, 
-  authorizeRoles('admin', 'manager'), 
-  validateId, 
-  validateMaintenance, 
-  async (req, res) => {
+// Update maintenance record (no authentication required)
+router.put('/:id', validateId, validateMaintenance, async (req, res) => {
     try {
       const { id } = req.params;
       const updateFields = req.body;
@@ -285,44 +277,40 @@ router.put('/:id',
       });
     }
   }
-);
+});
 
-// Delete maintenance record
-router.delete('/:id', 
-  authenticateToken, 
-  authorizeRoles('admin'), 
-  validateId, 
-  async (req, res) => {
-    try {
-      const { id } = req.params;
-      
-      // Check if record exists
-      const [existing] = await pool.execute(
-        'SELECT id FROM maintenance_records WHERE id = ?',
-        [id]
-      );
-      
-      if (existing.length === 0) {
-        return res.status(404).json({
-          error: 'Not Found',
-          message: 'Maintenance record not found'
-        });
-      }
-      
-      await pool.execute('DELETE FROM maintenance_records WHERE id = ?', [id]);
-      
-      res.json({
-        message: 'Maintenance record deleted successfully'
-      });
-    } catch (error) {
-      console.error('Error deleting maintenance record:', error);
-      res.status(500).json({
-        error: 'Internal Server Error',
-        message: 'Failed to delete maintenance record'
+// Delete maintenance record (no authentication required)
+router.delete('/:id', validateId, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const pool = await getPool();
+    
+    // Check if record exists
+    const [existing] = await pool.execute(
+      'SELECT id FROM maintenance_records WHERE id = ?',
+      [id]
+    );
+    
+    if (existing.length === 0) {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: 'Maintenance record not found'
       });
     }
+    
+    await pool.execute('DELETE FROM maintenance_records WHERE id = ?', [id]);
+    
+    res.json({
+      message: 'Maintenance record deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting maintenance record:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to delete maintenance record'
+    });
   }
-);
+});
 
 // Get maintenance statistics (no authentication required)
 router.get('/stats/overview', async (req, res) => {
