@@ -4,7 +4,8 @@
   "description": "Integrated Transport & Vehicle Management System for NIT University",
   "main": "backend/src/server.js",
   "scripts": {
-    "start": "node backend/src/server.js",
+    "start": "node force-railway-env.js",
+    "start:original": "node backend/src/server.js",
     "start:railway": "node railway-start.js",
     "dev": "nodemon backend/src/server.js",
     "build": "echo 'Frontend build process would go here'",
