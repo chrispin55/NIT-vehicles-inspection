@@ -169,77 +169,144 @@ function applyFilters() {
     console.log('🔄 Applying filters...');
 }
 
-// Form submission handlers - COMPLETELY FRONTEND ONLY
+// Form submission handlers - API + FRONTEND MODE
 function handleVehicleSubmit() {
-    console.log('🚗 Vehicle form submission - FRONTEND ONLY MODE');
+    console.log('🚗 Vehicle form submission - API + Frontend Mode');
     
     const formData = {
-        id: Date.now(), // Add unique ID
-        plateNumber: document.getElementById('plateNumber')?.value || '',
+        plate_number: document.getElementById('plateNumber')?.value || '',
         make: document.getElementById('vehicleMake')?.value || '',
         model: document.getElementById('vehicleModel')?.value || '',
-        year: document.getElementById('vehicleYear')?.value || '',
-        type: document.getElementById('vehicleType')?.value || '',
-        status: 'active'
+        manufacture_year: document.getElementById('vehicleYear')?.value || '',
+        vehicle_type: document.getElementById('vehicleType')?.value || '',
+        status: 'Active'
     };
     
     // Validate required fields
-    if (!formData.plateNumber || !formData.make || !formData.model) {
+    if (!formData.plate_number || !formData.make || !formData.model) {
         showNotification('Please fill in all required fields', 'warning');
         return;
     }
     
-    console.log('🚗 Vehicle data prepared (FRONTEND ONLY):', formData);
+    console.log('🚗 Vehicle data prepared for API:', formData);
     
-    // NO API CALL - Direct frontend update only
+    // Try API first, then fallback to frontend
     try {
-        // Add to table immediately
-        addVehicleToTable(formData);
+        // Show loading state
+        showAdvancedNotification('Saving vehicle to database...', 'info', 2000);
         
-        // Update dashboard stats
-        updateDashboardStats();
-        
-        // Show success
-        showNotification('Vehicle added successfully! (Saved in browser only)', 'success');
-        
-        // Reset form
-        document.getElementById('vehicleForm')?.reset();
-        
-        console.log('✅ Vehicle added successfully to frontend');
-        
+        // Call API to save to database
+        api.createVehicle(formData)
+            .then(response => {
+                console.log('✅ Vehicle saved to database:', response);
+                
+                // Add to frontend table with database ID
+                const vehicleData = { 
+                    ...formData, 
+                    id: response.id || Date.now(),
+                    plateNumber: formData.plate_number,
+                    year: formData.manufacture_year,
+                    type: formData.vehicle_type
+                };
+                addVehicleToTable(vehicleData);
+                
+                // Save to localStorage as backup
+                saveData('vehicles', vehicleData);
+                
+                // Update dashboard stats
+                updateDashboardStats();
+                
+                // Show success
+                showAdvancedNotification('Vehicle saved successfully to database!', 'success');
+                
+                // Reset form
+                document.getElementById('vehicleForm')?.reset();
+                
+            })
+            .catch(error => {
+                console.error('❌ API Error, falling back to frontend:', error);
+                
+                // Fallback to frontend-only mode
+                const vehicleData = { 
+                    ...formData, 
+                    id: Date.now(),
+                    plateNumber: formData.plate_number,
+                    year: formData.manufacture_year,
+                    type: formData.vehicle_type
+                };
+                addVehicleToTable(vehicleData);
+                saveData('vehicles', vehicleData);
+                updateDashboardStats();
+                
+                showAdvancedNotification('Vehicle saved locally (API unavailable)', 'warning');
+                document.getElementById('vehicleForm')?.reset();
+            });
+            
     } catch (error) {
-        console.error('❌ Error adding vehicle to frontend:', error);
-        showNotification('Error adding vehicle', 'danger');
+        console.error('❌ Error in vehicle submission:', error);
+        showAdvancedNotification('Error saving vehicle', 'danger');
     }
 }
 
 function handleDriverSubmit() {
     const formData = {
-        id: Date.now(), // Add unique ID
         name: document.getElementById('driverName')?.value || '',
-        license: document.getElementById('driverLicense')?.value || '',
-        phone: document.getElementById('driverPhone')?.value || '',
+        license_number: document.getElementById('driverLicense')?.value || '',
+        phone_number: document.getElementById('driverPhone')?.value || '',
         email: document.getElementById('driverEmail')?.value || '',
-        status: 'active'
+        status: 'Active'
     };
     
     // Validate required fields
-    if (!formData.name || !formData.license) {
+    if (!formData.name || !formData.license_number) {
         showNotification('Please fill in all required fields', 'warning');
         return;
     }
     
-    console.log('👤 Driver form submitted:', formData);
-    showNotification('Driver added successfully!', 'success');
+    console.log('👤 Driver data prepared for API:', formData);
     
-    // Reset form
-    document.getElementById('driverForm')?.reset();
-    
-    // Add to table
-    addDriverToTable(formData);
-    
-    // Update dashboard stats
-    updateDashboardStats();
+    // Try API first, then fallback to frontend
+    try {
+        showAdvancedNotification('Saving driver to database...', 'info', 2000);
+        
+        api.createDriver(formData)
+            .then(response => {
+                console.log('✅ Driver saved to database:', response);
+                
+                const driverData = { 
+                    ...formData, 
+                    id: response.id || Date.now(),
+                    license: formData.license_number,
+                    phone: formData.phone_number
+                };
+                addDriverToTable(driverData);
+                saveData('drivers', driverData);
+                updateDashboardStats();
+                
+                showAdvancedNotification('Driver saved successfully to database!', 'success');
+                document.getElementById('driverForm')?.reset();
+            })
+            .catch(error => {
+                console.error('❌ API Error, falling back to frontend:', error);
+                
+                const driverData = { 
+                    ...formData, 
+                    id: Date.now(),
+                    license: formData.license_number,
+                    phone: formData.phone_number
+                };
+                addDriverToTable(driverData);
+                saveData('drivers', driverData);
+                updateDashboardStats();
+                
+                showAdvancedNotification('Driver saved locally (API unavailable)', 'warning');
+                document.getElementById('driverForm')?.reset();
+            });
+            
+    } catch (error) {
+        console.error('❌ Error in driver submission:', error);
+        showAdvancedNotification('Error saving driver', 'danger');
+    }
 }
 
 function handleTripSubmit() {

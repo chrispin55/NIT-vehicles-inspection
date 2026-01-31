@@ -1,9 +1,9 @@
-// Main Application JavaScript - FRONTEND ONLY MODE
+// Main Application JavaScript - API + Frontend Mode
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOM Content Loaded - Starting NIT ITVMS (Frontend Only Mode)');
+    console.log('🚀 DOM Content Loaded - Starting NIT ITVMS (API + Frontend Mode)');
     
-    // NO API CONNECTION TEST - Frontend Only Mode
-    console.log('🔌 Frontend Only Mode - No API Connection Required');
+    // Test API connection first
+    testAPIConnection();
     
     // Initialize application
     initializeApp();
@@ -11,9 +11,118 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up event listeners
     setupEventListeners();
     
-    // NO DASHBOARD DATA LOADING - Handled by interactive-app.js
-    console.log('📊 Dashboard will be loaded by interactive-app.js');
+    // Load initial data from API or fallback
+    loadInitialData();
 });
+
+// Test API connection
+async function testAPIConnection() {
+    console.log('� Testing API connection...');
+    try {
+        const response = await fetch(`${window.location.origin}/health`);
+        const data = await response.json();
+        console.log('✅ Health check successful:', data);
+        
+        // Test API endpoint
+        const apiResponse = await fetch(`${window.location.origin}/api-info`);
+        const apiData = await apiResponse.json();
+        console.log('✅ API info successful:', apiData);
+        
+        showAdvancedNotification('API connection successful!', 'success');
+    } catch (error) {
+        console.error('❌ API connection test failed:', error);
+        showAdvancedNotification('API unavailable - working in offline mode', 'warning');
+    }
+}
+
+// Load initial data from API or fallback
+async function loadInitialData() {
+    console.log('📊 Loading initial data...');
+    
+    try {
+        // Try to load from API first
+        const overview = await api.getDashboardOverview();
+        console.log('📈 Dashboard overview loaded from API:', overview);
+        updateDashboardStats(overview);
+        
+        // Load other data from API
+        await loadFromAPI();
+        
+    } catch (error) {
+        console.error('❌ API loading failed, using fallback data:', error);
+        showAdvancedNotification('Using local data (API unavailable)', 'info');
+        
+        // Fallback to localStorage and sample data
+        loadFromLocalStorage();
+        loadSampleData();
+    }
+}
+
+async function loadFromAPI() {
+    try {
+        // Load vehicles
+        const vehicles = await api.getVehicles();
+        if (vehicles && vehicles.length > 0) {
+            vehicles.forEach(vehicle => addVehicleToTable(vehicle));
+            console.log('🚗 Vehicles loaded from API:', vehicles);
+        }
+        
+        // Load drivers
+        const drivers = await api.getDrivers();
+        if (drivers && drivers.length > 0) {
+            drivers.forEach(driver => addDriverToTable(driver));
+            console.log('👤 Drivers loaded from API:', drivers);
+        }
+        
+        // Load trips
+        const trips = await api.getTrips();
+        if (trips && trips.length > 0) {
+            trips.forEach(trip => addTripToTable(trip));
+            console.log('🛣️ Trips loaded from API:', trips);
+        }
+        
+        // Load maintenance
+        const maintenance = await api.getMaintenanceRecords();
+        if (maintenance && maintenance.length > 0) {
+            maintenance.forEach(record => addMaintenanceToTable(record));
+            console.log('🔧 Maintenance loaded from API:', maintenance);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading from API:', error);
+        throw error;
+    }
+}
+
+function loadFromLocalStorage() {
+    // Load vehicles from localStorage
+    const vehicles = loadData('vehicles');
+    if (vehicles && vehicles.length > 0) {
+        vehicles.forEach(vehicle => addVehicleToTable(vehicle));
+        console.log('� Vehicles loaded from localStorage:', vehicles);
+    }
+    
+    // Load drivers from localStorage
+    const drivers = loadData('drivers');
+    if (drivers && drivers.length > 0) {
+        drivers.forEach(driver => addDriverToTable(driver));
+        console.log('👤 Drivers loaded from localStorage:', drivers);
+    }
+    
+    // Load trips from localStorage
+    const trips = loadData('trips');
+    if (trips && trips.length > 0) {
+        trips.forEach(trip => addTripToTable(trip));
+        console.log('🛣️ Trips loaded from localStorage:', trips);
+    }
+    
+    // Load maintenance from localStorage
+    const maintenance = loadData('maintenance');
+    if (maintenance && maintenance.length > 0) {
+        maintenance.forEach(record => addMaintenanceToTable(record));
+        console.log('🔧 Maintenance loaded from localStorage:', maintenance);
+    }
+}
 
 function initializeApp() {
     // Set default date values
