@@ -40,27 +40,29 @@ app.get('/health', (req, res) => {
   });
 });
 
+// API info endpoint
+app.get('/api-info', (req, res) => {
+  res.json({
+    message: 'NIT ITVMS API Server',
+    status: 'Running',
+    endpoints: {
+      health: '/health',
+      api: '/api',
+      auth: '/api/auth',
+      vehicles: '/api/vehicles',
+      drivers: '/api/drivers',
+      trips: '/api/trips',
+      maintenance: '/api/maintenance',
+      dashboard: '/api/dashboard'
+    },
+    frontend: 'Root URL (/) serves the frontend application'
+  });
+});
+
 // Root route - serve frontend or API info
 app.get('/', (req, res) => {
-  if (process.env.NODE_ENV === 'production') {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
-  } else {
-    res.json({
-      message: 'NIT ITVMS API Server',
-      status: 'Running',
-      endpoints: {
-        health: '/health',
-        api: '/api',
-        auth: '/api/auth',
-        vehicles: '/api/vehicles',
-        drivers: '/api/drivers',
-        trips: '/api/trips',
-        maintenance: '/api/maintenance',
-        dashboard: '/api/dashboard'
-      },
-      frontend: 'Open frontend/index.html in your browser'
-    });
-  }
+  // Always serve the frontend HTML file
+  res.sendFile(path.join(__dirname, '../../frontend/index.html'));
 });
 
 // Serve static frontend files

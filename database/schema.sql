@@ -2,8 +2,8 @@
 -- Created for Railway.app MySQL deployment
 
 -- Create database if not exists
-CREATE DATABASE IF NOT EXISTS nit_itvms;
-USE nit_itvms;
+CREATE DATABASE IF NOT EXISTS railway;
+USE railway;
 
 -- Users table for authentication
 CREATE TABLE users (
