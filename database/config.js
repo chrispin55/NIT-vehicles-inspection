@@ -2,51 +2,25 @@ const mysql = require('mysql2/promise');
 
 const { logger, DatabaseError, handleDatabaseError } = require('../utils/errorHandler');
 
-const dbConfig = {
-  host: process.env.RAILWAY_PRIVATE_MYSQL_HOST || process.env.DB_HOST || 'localhost',
-  user: process.env.RAILWAY_PRIVATE_MYSQL_USER || process.env.DB_USER || 'root',
-  password: process.env.RAILWAY_PRIVATE_MYSQL_PASSWORD || process.env.DB_PASSWORD || '',
-  database: process.env.RAILWAY_PRIVATE_MYSQL_DATABASE_NAME || process.env.DB_NAME || 'nit_vehicle_management',
-  port: process.env.RAILWAY_PRIVATE_MYSQL_PORT || process.env.DB_PORT || 3306,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  charset: 'utf8mb4'
-};
-
-// Use Cloud SQL in production (disabled for now)
-const isProduction = process.env.NODE_ENV === 'production';
-const isRailway = process.env.RAILWAY_ENVIRONMENT === 'production' || 
-                    process.env.RAILWAY_PRIVATE_MYSQL_HOST || 
-                    process.env.RAILWAY_PUBLIC_DOMAIN; // Railway sets this
-const useCloudSQL = false; // Disabled until Cloud SQL is properly configured
+// Import Railway configuration
+const { dbConfig, isRailway, initializeRailwayPool } = require('./railway-config');
 
 let pool;
 
 async function initializePool() {
   try {
     // Debug logging for Railway environment
-    if (process.env.NODE_ENV === 'production') {
-      logger.info('🔧 Production environment detected');
-      logger.info('📍 Railway MySQL Host:', process.env.RAILWAY_PRIVATE_MYSQL_HOST);
-      logger.info('🔌 Railway MySQL Port:', process.env.RAILWAY_PRIVATE_MYSQL_PORT);
-      logger.info('👤 Railway MySQL User:', process.env.RAILWAY_PRIVATE_MYSQL_USER);
-      logger.info('💾 Railway MySQL Database:', process.env.RAILWAY_PRIVATE_MYSQL_DATABASE_NAME);
-      logger.info('🏗️ Railway Environment:', process.env.RAILWAY_ENVIRONMENT);
-      logger.info('🌐 Railway Public Domain:', process.env.RAILWAY_PUBLIC_DOMAIN);
-      
-      // Log all environment variables for debugging
-      logger.info('📋 All Environment Variables:');
-      Object.keys(process.env).forEach(key => {
-        if (key.includes('RAILWAY') || key.includes('MYSQL') || key === 'NODE_ENV') {
-          logger.info(`  ${key}: ${process.env[key]}`);
-        }
-      });
-    }
+    logger.info('🔧 Initializing database connection...');
+    logger.info('🏗️ Environment:', isRailway ? 'Railway' : 'Local');
+    logger.info('📍 Host:', dbConfig.host);
+    logger.info('🔌 Port:', dbConfig.port);
+    logger.info('👤 User:', dbConfig.user);
+    logger.info('💾 Database:', dbConfig.database);
     
+    // Use Railway-specific initialization
     if (isRailway) {
-      logger.info('🔧 Initializing Railway MySQL connection...');
-      pool = mysql.createPool(dbConfig);
+      logger.info('� Using Railway MySQL configuration...');
+      pool = await initializeRailwayPool();
     } else {
       logger.info('🔧 Initializing local MySQL connection...');
       pool = mysql.createPool(dbConfig);
