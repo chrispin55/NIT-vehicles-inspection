@@ -44,10 +44,46 @@ class ModernITVMS {
 
     // Setup event listeners
     setupEventListeners() {
-        // Login form
+        // Login form - handle Enter key and interactive elements
         const loginForm = document.getElementById('loginForm');
         if (loginForm) {
-            loginForm.addEventListener('submit', (e) => this.handleLogin(e));
+            // Handle Enter key on username field
+            const usernameField = document.getElementById('username');
+            if (usernameField) {
+                usernameField.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('password').focus();
+                    }
+                });
+            }
+            
+            // Handle Enter key on password field
+            const passwordField = document.getElementById('password');
+            if (passwordField) {
+                passwordField.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.handleLogin();
+                    }
+                });
+            }
+            
+            // Handle login prompt click
+            const loginPrompt = document.querySelector('.login-prompt');
+            if (loginPrompt) {
+                loginPrompt.addEventListener('click', () => {
+                    this.handleLogin();
+                });
+            }
+            
+            // Handle password toggle
+            const passwordToggle = document.getElementById('passwordToggle');
+            if (passwordToggle) {
+                passwordToggle.addEventListener('click', () => {
+                    this.togglePasswordVisibility();
+                });
+            }
         }
 
         // Logout button
@@ -57,7 +93,7 @@ class ModernITVMS {
         }
 
         // Tab navigation
-        const tabButtons = document.querySelectorAll('[data-bs-toggle="pill"]');
+        const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
         tabButtons.forEach(button => {
             button.addEventListener('shown.bs.tab', (e) => this.handleTabChange(e));
         });
@@ -259,15 +295,25 @@ class ModernITVMS {
     }
 
     async handleLogin(e) {
-        e.preventDefault();
+        // Prevent form submission if called from event
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const loginPrompt = document.querySelector('.login-prompt');
+        
+        // Validate inputs
+        if (!username || !password) {
+            this.showFieldError(document.getElementById('username'), !username, 'Username is required');
+            this.showFieldError(document.getElementById('password'), !password, 'Password is required');
+            return;
+        }
         
         try {
             // Show loading state
-            this.setButtonLoading(submitBtn, true);
+            this.showLoginLoading(true);
             
             const response = await this.apiRequest('/auth/login', {
                 method: 'POST',
@@ -277,6 +323,9 @@ class ModernITVMS {
             // Store token and user data in memory only
             this.token = response.token;
             this.user = response.user;
+
+            // Show success state
+            this.showLoginSuccess();
 
             // Show success message
             this.showSuccess('Login successful! Redirecting...');
@@ -288,9 +337,9 @@ class ModernITVMS {
             }, 1500);
 
         } catch (error) {
-            this.showError('Invalid username or password');
-        } finally {
-            this.setButtonLoading(submitBtn, false);
+            this.showLoginLoading(false);
+            this.showFieldError(document.getElementById('password'), true, 'Invalid username or password');
+            console.error('Login failed:', error);
         }
     }
 
@@ -1019,6 +1068,89 @@ class ModernITVMS {
     applyFilters() {
         // TODO: Implement advanced filtering
         console.log('Applying filters...');
+    }
+
+    // Interactive Login Methods
+    togglePasswordVisibility() {
+        const passwordField = document.getElementById('password');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const icon = passwordToggle.querySelector('i');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    showLoginLoading(show) {
+        const loginPrompt = document.querySelector('.login-prompt');
+        const passwordField = document.getElementById('password');
+        const usernameField = document.getElementById('username');
+        
+        if (show) {
+            loginPrompt.classList.add('loading');
+            loginPrompt.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i><span>Authenticating...</span>';
+            passwordField.classList.add('loading');
+            usernameField.classList.add('loading');
+        } else {
+            loginPrompt.classList.remove('loading');
+            loginPrompt.innerHTML = '<i class="fas fa-arrow-right me-2"></i><span>Press Enter to login</span>';
+            passwordField.classList.remove('loading');
+            usernameField.classList.remove('loading');
+        }
+    }
+
+    showLoginSuccess() {
+        const loginPrompt = document.querySelector('.login-prompt');
+        loginPrompt.classList.remove('loading');
+        loginPrompt.classList.add('success');
+        loginPrompt.innerHTML = '<i class="fas fa-check me-2"></i><span>Login Successful!</span>';
+    }
+
+    showFieldError(field, show, message) {
+        const wrapper = field.closest('.input-wrapper');
+        const icon = wrapper.querySelector('.input-icon');
+        
+        if (show) {
+            field.classList.add('is-invalid');
+            field.classList.remove('is-valid');
+            icon.classList.add('fa-exclamation-circle');
+            icon.classList.remove('fa-check-circle');
+            
+            // Show error message
+            let errorMsg = wrapper.querySelector('.error-message');
+            if (!errorMsg) {
+                errorMsg = document.createElement('div');
+                errorMsg.className = 'error-message';
+                wrapper.appendChild(errorMsg);
+            }
+            errorMsg.textContent = message;
+            errorMsg.style.color = '#ef4444';
+            errorMsg.style.fontSize = '0.8rem';
+            errorMsg.style.marginTop = '0.25rem';
+        } else {
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+            icon.classList.remove('fa-exclamation-circle');
+            icon.classList.add('fa-check-circle');
+            
+            // Remove error message
+            const errorMsg = wrapper.querySelector('.error-message');
+            if (errorMsg) {
+                errorMsg.remove();
+            }
+        }
+        
+        // Clear validation after 3 seconds
+        setTimeout(() => {
+            field.classList.remove('is-valid', 'is-invalid');
+            icon.classList.remove('fa-check-circle', 'fa-exclamation-circle');
+        }, 3000);
     }
 }
 
