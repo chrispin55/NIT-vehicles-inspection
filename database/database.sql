@@ -1,11 +1,8 @@
 -- NIT University Dar es Salaam - PROJECT KALI ITVMS
--- Complete Database Schema and Initialization
--- Single file for all database operations
+-- Complete Database Schema for Railway Deployment
+-- Uses the existing 'railway' database
 
--- Create database if not exists
-CREATE DATABASE IF NOT EXISTS nit_vehicle_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE nit_vehicle_management;
+USE railway;
 
 -- Users table for authentication
 CREATE TABLE IF NOT EXISTS users (

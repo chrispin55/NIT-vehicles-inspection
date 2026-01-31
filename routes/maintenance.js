@@ -103,8 +103,7 @@ router.get('/:id', validateId, async (req, res) => {
       SELECT mr.*, 
              v.plate_number, 
              v.vehicle_type, 
-             v.model,
-             v.manufacture_year
+             v.model
       FROM maintenance_records mr
       JOIN vehicles v ON mr.vehicle_id = v.id
       WHERE mr.id = ?
@@ -129,153 +128,153 @@ router.get('/:id', validateId, async (req, res) => {
 
 // Create maintenance record (no authentication required)
 router.post('/', validateMaintenance, async (req, res) => {
-    try {
-      const {
-        vehicle_id,
-        maintenance_type,
-        description,
-        cost,
-        maintenance_date,
-        next_maintenance_date,
-        mechanic_name,
-        status = 'Scheduled'
-      } = req.body;
-      
-      // Check if vehicle exists
-      const [vehicleCheck] = await pool.execute(
-        'SELECT id, plate_number FROM vehicles WHERE id = ?',
-        [vehicle_id]
-      );
-      
-      if (vehicleCheck.length === 0) {
-        return res.status(400).json({
-          error: 'Bad Request',
-          message: 'Vehicle not found'
-        });
-      }
-      
-      const [result] = await pool.execute(`
-        INSERT INTO maintenance_records (
-          vehicle_id, maintenance_type, description, cost, maintenance_date,
-          next_maintenance_date, mechanic_name, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `, [
-        vehicle_id, maintenance_type, description, cost, maintenance_date,
-        next_maintenance_date, mechanic_name, status
-      ]);
-      
-      // Update vehicle's next maintenance date if provided
-      if (next_maintenance_date) {
-        await pool.execute(
-          'UPDATE vehicles SET next_maintenance_date = ? WHERE id = ?',
-          [next_maintenance_date, vehicle_id]
-        );
-      }
-      
-      // Return the created record
-      const pool = await getPool();
-      const [newRecord] = await pool.execute(`
-        SELECT mr.*, 
-               v.plate_number, 
-               v.vehicle_type, 
-               v.model
-        FROM maintenance_records mr
-        JOIN vehicles v ON mr.vehicle_id = v.id
-        WHERE mr.id = ?
-      `, [result.insertId]);
-      
-      res.status(201).json({
-        message: 'Maintenance record created successfully',
-        record: newRecord[0]
-      });
-    } catch (error) {
-      console.error('Error creating maintenance record:', error);
-      res.status(500).json({
-        error: 'Internal Server Error',
-        message: 'Failed to create maintenance record'
+  try {
+    const {
+      vehicle_id,
+      maintenance_type,
+      description,
+      cost,
+      maintenance_date,
+      next_maintenance_date,
+      mechanic_name,
+      status = 'Scheduled'
+    } = req.body;
+    
+    const pool = await getPool();
+    
+    // Check if vehicle exists
+    const [vehicleCheck] = await pool.execute(
+      'SELECT id, plate_number FROM vehicles WHERE id = ?',
+      [vehicle_id]
+    );
+    
+    if (vehicleCheck.length === 0) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'Vehicle not found'
       });
     }
+    
+    const [result] = await pool.execute(`
+      INSERT INTO maintenance_records (
+        vehicle_id, maintenance_type, description, cost, maintenance_date,
+        next_maintenance_date, mechanic_name, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      vehicle_id, maintenance_type, description, cost, maintenance_date,
+      next_maintenance_date, mechanic_name, status
+    ]);
+    
+    // Update vehicle's next maintenance date if provided
+    if (next_maintenance_date) {
+      await pool.execute(
+        'UPDATE vehicles SET next_maintenance_date = ? WHERE id = ?',
+        [next_maintenance_date, vehicle_id]
+      );
+    }
+    
+    // Return the created record
+    const [newRecord] = await pool.execute(`
+      SELECT mr.*, 
+             v.plate_number, 
+             v.vehicle_type, 
+             v.model
+      FROM maintenance_records mr
+      JOIN vehicles v ON mr.vehicle_id = v.id
+      WHERE mr.id = ?
+    `, [result.insertId]);
+    
+    res.status(201).json({
+      message: 'Maintenance record created successfully',
+      record: newRecord[0]
+    });
+  } catch (error) {
+    console.error('Error creating maintenance record:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to create maintenance record'
+    });
   }
-);
+});
 
 // Update maintenance record (no authentication required)
 router.put('/:id', validateId, validateMaintenance, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updateFields = req.body;
-      
-      // Check if record exists
-      const [existing] = await pool.execute(
-        'SELECT id, vehicle_id, status FROM maintenance_records WHERE id = ?',
-        [id]
-      );
-      
-      if (existing.length === 0) {
-        return res.status(404).json({
-          error: 'Not Found',
-          message: 'Maintenance record not found'
-        });
-      }
-      
-      const record = existing[0];
-      
-      // Build dynamic update query
-      const fields = Object.keys(updateFields);
-      const values = Object.values(updateFields);
-      
-      if (fields.length === 0) {
-        return res.status(400).json({
-          error: 'Bad Request',
-          message: 'No fields to update'
-        });
-      }
-      
-      const setClause = fields.map(field => `${field} = ?`).join(', ');
-      
-      await pool.execute(
-        `UPDATE maintenance_records SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-        [...values, id]
-      );
-      
-      // Update vehicle's next maintenance date if changed
-      if (updateFields.next_maintenance_date) {
-        await pool.execute(
-          'UPDATE vehicles SET next_maintenance_date = ? WHERE id = ?',
-          [updateFields.next_maintenance_date, record.vehicle_id]
-        );
-      }
-      
-      // If status changed to 'Completed', update vehicle status to 'Active'
-      if (updateFields.status === 'Completed' && record.status !== 'Completed') {
-        await pool.execute(
-          'UPDATE vehicles SET status = "Active" WHERE id = ?',
-          [record.vehicle_id]
-        );
-      }
-      
-      // Return updated record
-      const pool = await getPool();
-      const [updatedRecord] = await pool.execute(`
-        SELECT mr.*, 
-               v.plate_number, 
-               v.vehicle_type, 
-               v.model
-        FROM maintenance_records mr
-        JOIN vehicles v ON mr.vehicle_id = v.id
-        WHERE mr.id = ?
-      `, [id]);
-      
-      res.json({
-        message: 'Maintenance record updated successfully',
-        record: updatedRecord[0]
-      });
-    } catch (error) {
-      console.error('Error updating maintenance record:', error);
-      res.status(500).json({
-        error: 'Internal Server Error',
-        message: 'Failed to update maintenance record'
+  try {
+    const { id } = req.params;
+    const updateFields = req.body;
+    
+    const pool = await getPool();
+    
+    // Check if record exists
+    const [existing] = await pool.execute(
+      'SELECT id, vehicle_id, status FROM maintenance_records WHERE id = ?',
+      [id]
+    );
+    
+    if (existing.length === 0) {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: 'Maintenance record not found'
       });
     }
+    
+    const record = existing[0];
+    
+    // Build dynamic update query
+    const fields = Object.keys(updateFields);
+    const values = Object.values(updateFields);
+    
+    if (fields.length === 0) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'No fields to update'
+      });
+    }
+    
+    const setClause = fields.map(field => `${field} = ?`).join(', ');
+    
+    await pool.execute(
+      `UPDATE maintenance_records SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+      [...values, id]
+    );
+    
+    // Update vehicle's next maintenance date if changed
+    if (updateFields.next_maintenance_date) {
+      await pool.execute(
+        'UPDATE vehicles SET next_maintenance_date = ? WHERE id = ?',
+        [updateFields.next_maintenance_date, record.vehicle_id]
+      );
+    }
+    
+    // If status changed to 'Completed', update vehicle status to 'Active'
+    if (updateFields.status === 'Completed' && record.status !== 'Completed') {
+      await pool.execute(
+        'UPDATE vehicles SET status = "Active" WHERE id = ?',
+        [record.vehicle_id]
+      );
+    }
+    
+    // Return updated record
+    const [updatedRecord] = await pool.execute(`
+      SELECT mr.*, 
+             v.plate_number, 
+             v.vehicle_type, 
+             v.model
+      FROM maintenance_records mr
+      JOIN vehicles v ON mr.vehicle_id = v.id
+      WHERE mr.id = ?
+    `, [id]);
+    
+    res.json({
+      message: 'Maintenance record updated successfully',
+      record: updatedRecord[0]
+    });
+  } catch (error) {
+    console.error('Error updating maintenance record:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to update maintenance record'
+    });
   }
 });
 
