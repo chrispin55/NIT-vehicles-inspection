@@ -1,9 +1,24 @@
 {
   "build": {
-    "builder": "NIXPACKS"
+    "builder": "NIXPACKS",
+    "buildCommand": "npm install",
+    "watchPatterns": [
+      "**/*.js",
+      "**/*.json",
+      "**/*.sql"
+    ]
   },
   "deploy": {
     "startCommand": "npm start",
-    "healthcheckPath": "/health"
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 100,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  },
+  "services": {
+    "api": {
+      "sourceDir": "/",
+      "healthcheckPath": "/health"
+    }
   }
 }

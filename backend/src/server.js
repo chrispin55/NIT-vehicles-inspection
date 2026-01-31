@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
+const path = require('path');
 require('dotenv').config();
 
 const { testConnection } = require('./config/database');
@@ -39,6 +40,32 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Root route - serve frontend or API info
+app.get('/', (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+  } else {
+    res.json({
+      message: 'NIT ITVMS API Server',
+      status: 'Running',
+      endpoints: {
+        health: '/health',
+        api: '/api',
+        auth: '/api/auth',
+        vehicles: '/api/vehicles',
+        drivers: '/api/drivers',
+        trips: '/api/trips',
+        maintenance: '/api/maintenance',
+        dashboard: '/api/dashboard'
+      },
+      frontend: 'Open frontend/index.html in your browser'
+    });
+  }
+});
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '../../frontend')));
+
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
@@ -49,9 +76,8 @@ app.use('/api/dashboard', dashboardRoutes);
 
 // Serve static files from frontend in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('../frontend/dist'));
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    res.sendFile(path.join(__dirname, '../../frontend/index.html'));
   });
 }
 
