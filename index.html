@@ -224,7 +224,7 @@
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="recentTripsTable">
+                                            <tbody id="recentTrips">
                                                 <!-- Recent trips will be populated here -->
                                             </tbody>
                                         </table>
@@ -241,6 +241,29 @@
                         <div class="col-12">
                             <h3 class="section-title">Vehicle Management</h3>
                             <p>Add, update, and manage university vehicles</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Search and Filter -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="vehicleSearch" placeholder="Search vehicles by plate, model, or type...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="vehicleStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Under Maintenance">Under Maintenance</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-nit w-100" onclick="app.showAddVehicleModal()">
+                                <i class="fas fa-plus me-2"></i>Add Vehicle
+                            </button>
                         </div>
                     </div>
                     
@@ -310,23 +333,8 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Plate No.</th>
-                                                    <th>Type</th>
-                                                    <th>Model</th>
-                                                    <th>Year</th>
-                                                    <th>Capacity</th>
-                                                    <th>Status</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="vehicleList">
-                                                <!-- Vehicle data will be populated here -->
-                                            </tbody>
-                                        </table>
+                                    <div class="row" id="vehiclesList">
+                                        <!-- Vehicle cards will be populated here -->
                                     </div>
                                 </div>
                             </div>
@@ -340,6 +348,29 @@
                         <div class="col-12">
                             <h3 class="section-title">Driver Management</h3>
                             <p>Manage driver information and assignments</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Search and Filter -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="driverSearch" placeholder="Search drivers by name, license, or phone...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="driverStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="On Leave">On Leave</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-nit w-100" onclick="app.showAddDriverModal()">
+                                <i class="fas fa-plus me-2"></i>Add Driver
+                            </button>
                         </div>
                     </div>
                     
@@ -387,24 +418,8 @@
                                     <i class="fas fa-users me-2"></i>Driver List
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Driver ID</th>
-                                                    <th>Name</th>
-                                                    <th>License No.</th>
-                                                    <th>Phone</th>
-                                                    <th>Experience</th>
-                                                    <th>Assigned Vehicle</th>
-                                                    <th>Status</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="driverList">
-                                                <!-- Driver data will be populated here -->
-                                            </tbody>
-                                        </table>
+                                    <div class="row" id="driversList">
+                                        <!-- Driver cards will be populated here -->
                                     </div>
                                 </div>
                             </div>
@@ -418,6 +433,30 @@
                         <div class="col-12">
                             <h3 class="section-title">Trip / Route Management</h3>
                             <p>Schedule and track vehicle trips</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Search and Filter -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="tripSearch" placeholder="Search trips by route or driver...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="tripStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-nit w-100" onclick="app.showAddTripModal()">
+                                <i class="fas fa-plus me-2"></i>Schedule Trip
+                            </button>
                         </div>
                     </div>
                     
@@ -506,23 +545,8 @@
                                             <label class="form-check-label" for="upcomingTrips">Upcoming</label>
                                         </div>
                                     </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Trip ID</th>
-                                                    <th>Route</th>
-                                                    <th>Driver</th>
-                                                    <th>Vehicle</th>
-                                                    <th>Date & Time</th>
-                                                    <th>Status</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tripList">
-                                                <!-- Trip data will be populated here -->
-                                            </tbody>
-                                        </table>
+                                    <div class="row" id="tripsList">
+                                        <!-- Trip cards will be populated here -->
                                     </div>
                                 </div>
                             </div>
@@ -536,6 +560,31 @@
                         <div class="col-12">
                             <h3 class="section-title">Maintenance Management</h3>
                             <p>Track vehicle maintenance and service records</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Search and Filter -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="maintenanceSearch" placeholder="Search maintenance records...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="maintenanceTypeFilter">
+                                <option value="">All Types</option>
+                                <option value="Routine Maintenance">Routine Maintenance</option>
+                                <option value="Oil Change">Oil Change</option>
+                                <option value="Brake Repair">Brake Repair</option>
+                                <option value="Tire Replacement">Tire Replacement</option>
+                                <option value="Engine Repair">Engine Repair</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-nit w-100" onclick="app.showAddMaintenanceModal()">
+                                <i class="fas fa-plus me-2"></i>Add Record
+                            </button>
                         </div>
                     </div>
                     
@@ -596,25 +645,8 @@
                                     <i class="fas fa-list me-2"></i>Maintenance Records
                                 </div>
                                 <div class="card-body">
-                                    <div class="mb-3">
-                                        <input type="text" class="form-control" id="searchMaintenance" placeholder="Search by vehicle, type, or description...">
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Vehicle</th>
-                                                    <th>Service Date</th>
-                                                    <th>Type</th>
-                                                    <th>Description</th>
-                                                    <th>Cost</th>
-                                                    <th>Next Service</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="maintenanceList">
-                                                <!-- Maintenance data will be populated here -->
-                                            </tbody>
-                                        </table>
+                                    <div class="row" id="maintenanceList">
+                                        <!-- Maintenance cards will be populated here -->
                                     </div>
                                 </div>
                             </div>
@@ -757,7 +789,6 @@
     
     <!-- Custom JavaScript -->
     <script src="js/errorHandler.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/events.js"></script>
+    <script src="js/modern-app.js"></script>
 </body>
 </html>
