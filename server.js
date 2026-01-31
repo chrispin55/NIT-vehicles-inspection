@@ -17,6 +17,9 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy for Railway (fixes X-Forwarded-For header issue)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {

@@ -5,6 +5,10 @@ const { logger, DatabaseError, handleDatabaseError } = require('../utils/errorHa
 // Import Railway configuration
 const { dbConfig, isRailway, initializeRailwayPool } = require('./railway-config');
 
+// Use Cloud SQL in production (disabled for now)
+const isProduction = process.env.NODE_ENV === 'production';
+const useCloudSQL = false; // Disabled until Cloud SQL is properly configured
+
 let pool;
 
 async function initializePool() {
