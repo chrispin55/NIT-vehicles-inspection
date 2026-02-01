@@ -1,27 +1,49 @@
-# PROJECT KALI - Integrated Transport & Vehicle Management System (ITVMS)
+# NIT University - Integrated Transport & Vehicle Management System (ITVMS)
 
-A comprehensive vehicle management system for NIT University Dar es Salaam, built with modern web technologies and cloud deployment capabilities.
+**PROJECT KALI** - A comprehensive transport management system for NIT University Dar es Salaam.
 
 ## 🚀 Features
 
-- **Vehicle Management**: Add, update, and manage university vehicles
-- **Driver Management**: Manage driver information and assignments
-- **Trip Management**: Schedule and track vehicle trips
-- **Maintenance Tracking**: Track vehicle maintenance and service history
-- **Dashboard Analytics**: Real-time statistics and charts
-- **Reports & Analytics**: Generate comprehensive reports
-- **Authentication**: Secure user authentication and role-based access
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+### Core Modules
+- **Dashboard** - Real-time statistics and overview
+- **Vehicle Management** - Add, update, and manage university vehicles
+- **Driver Management** - Manage driver information and assignments
+- **Trip Management** - Schedule and track vehicle trips
+- **Maintenance Tracking** - Track vehicle maintenance and service history
+- **Reports & Analytics** - Generate comprehensive reports
 
-## 🛠️ Technology Stack
+### Technical Features
+- **RESTful API** - Complete backend API with Express.js
+- **MySQL Database** - Robust data storage with proper relationships
+- **Authentication System** - Secure user authentication with JWT
+- **Real-time Updates** - Live data synchronization
+- **Responsive Design** - Mobile-friendly interface
+- **Data Validation** - Input validation and error handling
+- **Security Features** - Rate limiting, CORS, helmet security
+
+## 🌐 Deployment Options
+
+### 🏠 Local Development
+- Traditional setup with local MySQL database
+- Perfect for development and testing
+
+### � Railway Cloud Deployment ⭐ **Recommended**
+- **Managed MySQL Database** - No database maintenance required
+- **Automatic SSL Certificates** - Secure HTTPS by default
+- **Zero-Configuration Deployment** - Deploy from GitHub in minutes
+- **Built-in Monitoring** - Health checks and logging
+- **Scalable Infrastructure** - Automatic scaling based on demand
+
+## �🛠️ Technology Stack
 
 ### Backend
 - **Node.js** - Runtime environment
 - **Express.js** - Web framework
-- **Sequelize** - ORM for database operations
-- **MySQL** - Database (Railway.app hosted)
+- **MySQL** - Database (Local or Railway Managed)
 - **JWT** - Authentication tokens
 - **bcryptjs** - Password hashing
+- **Helmet** - Security middleware
+- **CORS** - Cross-origin resource sharing
 
 ### Frontend
 - **HTML5, CSS3, JavaScript** - Core technologies
@@ -30,202 +52,201 @@ A comprehensive vehicle management system for NIT University Dar es Salaam, buil
 - **Font Awesome** - Icons
 
 ### Deployment
-- **Railway.app** - Cloud hosting platform
-- **MySQL Cloud Database** - Managed database service
+- **Railway** - Cloud platform (Recommended)
+- **GitHub** - Version control and CI/CD
 
-## 📋 Project Structure
+## 📋 Prerequisites
 
-```
-nit-itvms/
-├── backend/
-│   └── src/
-│       ├── config/
-│       │   └── database.js      # Database configuration
-│       ├── controllers/         # Route controllers (if needed)
-│       ├── middleware/          # Custom middleware (if needed)
-│       ├── models/
-│       │   └── index.js         # Sequelize models
-│       ├── routes/
-│       │   ├── auth.js          # Authentication routes
-│       │   ├── vehicles.js      # Vehicle management routes
-│       │   ├── drivers.js       # Driver management routes
-│       │   ├── trips.js         # Trip management routes
-│       │   ├── maintenance.js   # Maintenance tracking routes
-│       │   └── dashboard.js     # Dashboard data routes
-│       ├── utils/               # Utility functions (if needed)
-│       └── server.js            # Main server file
-├── frontend/
-│   ├── index.html               # Main HTML file
-│   └── src/
-│       ├── css/
-│       │   └── style.css        # Custom styles
-│       └── js/
-│           ├── api.js           # API communication layer
-│           └── app.js           # Main application logic
-├── database/
-│   └── schema.sql               # Database schema and sample data
-├── .env.example                 # Environment variables template
-├── .gitignore                   # Git ignore rules
-├── package.json                 # Node.js dependencies
-├── railway.json                 # Railway.app deployment config
-└── README.md                    # This file
-```
+### For Local Development
+- Node.js (v14 or higher)
+- MySQL Server (v5.7 or higher)
+- npm or yarn package manager
+
+### For Railway Deployment
+- Railway account (https://railway.app)
+- GitHub account
+- Git installed locally
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- MySQL database (local or Railway.app)
+### 🏠 Local Development
 
-### Local Development
-
-1. **Clone the repository**
+1. **Clone the Repository**
    ```bash
    git clone <repository-url>
-   cd nit-itvms
+   cd "NIT university"
    ```
 
-2. **Install dependencies**
+2. **Install Dependencies**
    ```bash
    npm install
    ```
 
-3. **Set up environment variables**
+3. **Database Setup**
+   ```sql
+   CREATE DATABASE nit_itvms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   mysql -u your_username -p nit_itvms < database/schema.sql
+   ```
+
+4. **Environment Configuration**
    ```bash
    cp .env.example .env
-   ```
-   Edit `.env` with your database credentials:
-   ```env
-   PORT=3000
-   NODE_ENV=development
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_NAME=nit_itvms
-   DB_USER=your_db_user
-   DB_PASSWORD=your_db_password
-   JWT_SECRET=your_super_secret_jwt_key_here
+   # Edit .env with your database credentials
    ```
 
-4. **Set up the database**
-   ```bash
-   mysql -u your_db_user -p nit_itvms < database/schema.sql
-   ```
-
-5. **Start the development server**
+5. **Start the Application**
    ```bash
    npm run dev
    ```
 
-6. **Open the application**
-   - Backend API: http://localhost:3000
-   - Frontend: Open `frontend/index.html` in your browser
+### 🚂 Railway Deployment (Recommended)
 
-### Railway.app Deployment
+1. **Push to GitHub**
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit - NIT ITVMS"
+   git branch -M main
+   git remote add origin https://github.com/your-username/nit-itvms.git
+   git push -u origin main
+   ```
 
-1. **Create a Railway.app account**
-   - Sign up at [railway.app](https://railway.app)
+2. **Deploy on Railway**
+   - Go to https://railway.app
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select your repository
+   - Set environment variables:
+     - `JWT_SECRET` (required)
+     - `MYSQL_ROOT_PASSWORD` (required)
 
-2. **Deploy the application**
-   - Connect your GitHub repository to Railway.app
-   - Railway.app will automatically detect the Node.js application
-   - Set up environment variables in Railway.app dashboard
-   - Deploy!
+3. **Access Your Application**
+   - Railway will provide you with a live URL
+   - Database is automatically created and configured
 
-3. **Set up database**
-   - Add a MySQL service in Railway.app
-   - Update the database connection string in environment variables
-   - Run the schema.sql file to set up tables
+📖 **For detailed Railway deployment instructions, see [DEPLOYMENT-RAILWAY.md](DEPLOYMENT-RAILWAY.md)**
+
+## 📁 Project Structure
+
+```
+NIT university/
+├── backend/
+│   ├── config/
+│   │   ├── database.js          # Local database config
+│   │   └── database-railway.js  # Railway database config
+│   ├── models/                  # Data models
+│   ├── routes/                  # API routes
+│   └── utils/                   # Utility functions
+├── database/
+│   ├── schema.sql               # Local database schema
+│   └── schema-railway.sql       # Railway database schema
+├── frontend/
+│   ├── js/                      # Frontend JavaScript modules
+│   └── css/                     # Custom styles
+├── server.js                    # Local development server
+├── server-railway.js            # Railway production server
+├── railway.toml                 # Railway deployment config
+├── package.json                 # Node.js dependencies
+├── .env.example                 # Environment template
+├── .env.railway                 # Railway environment template
+├── README.md                    # This file
+└── DEPLOYMENT-RAILWAY.md        # Railway deployment guide
+```
+
+## 🔐 Default Login Credentials
+
+### Administrator
+- **Username**: admin
+- **Password**: password
+
+### Manager
+- **Username**: jmanager
+- **Password**: password
+
+*⚠️ Change these passwords in production environment!*
 
 ## 📊 API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - User login
 - `GET /api/auth/profile` - Get user profile
-- `PUT /api/auth/profile` - Update user profile
 
 ### Vehicles
 - `GET /api/vehicles` - Get all vehicles
-- `GET /api/vehicles/:id` - Get specific vehicle
 - `POST /api/vehicles` - Create new vehicle
 - `PUT /api/vehicles/:id` - Update vehicle
 - `DELETE /api/vehicles/:id` - Delete vehicle
-- `GET /api/vehicles/stats/summary` - Get vehicle statistics
 
 ### Drivers
 - `GET /api/drivers` - Get all drivers
-- `GET /api/drivers/:id` - Get specific driver
 - `POST /api/drivers` - Create new driver
 - `PUT /api/drivers/:id` - Update driver
 - `DELETE /api/drivers/:id` - Delete driver
-- `GET /api/drivers/vehicles/available` - Get available vehicles
 
 ### Trips
 - `GET /api/trips` - Get all trips
-- `GET /api/trips/:id` - Get specific trip
 - `POST /api/trips` - Create new trip
 - `PUT /api/trips/:id` - Update trip
 - `DELETE /api/trips/:id` - Delete trip
-- `GET /api/trips/resources/available` - Get available resources
 
 ### Maintenance
-- `GET /api/maintenance` - Get maintenance records
-- `GET /api/maintenance/:id` - Get specific record
+- `GET /api/maintenance` - Get all maintenance records
 - `POST /api/maintenance` - Create maintenance record
 - `PUT /api/maintenance/:id` - Update maintenance record
 - `DELETE /api/maintenance/:id` - Delete maintenance record
 
-### Dashboard
-- `GET /api/dashboard/overview` - Get dashboard overview
-- `GET /api/dashboard/recent-trips` - Get recent trips
-- `GET /api/dashboard/fuel-analysis` - Get fuel analysis data
-- `GET /api/dashboard/vehicle-status` - Get vehicle status distribution
-- `GET /api/dashboard/operational-costs` - Get operational costs
-- `GET /api/dashboard/monthly-summary` - Get monthly summary
+### Reports
+- `GET /api/reports/dashboard` - Get dashboard data
+- `GET /api/reports/fuel-consumption` - Fuel consumption report
+- `GET /api/reports/trip-summary` - Trip summary report
+- `GET /api/reports/vehicle-utilization` - Vehicle utilization report
 
-## 🔧 Configuration
+## 🏥 Health Check
 
-### Environment Variables
+The application includes a health check endpoint:
+- **Local**: http://localhost:3000/api/health
+- **Railway**: https://your-app.up.railway.app/api/health
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Server port | 3000 |
-| `NODE_ENV` | Environment | development |
-| `DB_HOST` | Database host | localhost |
-| `DB_PORT` | Database port | 3306 |
-| `DB_NAME` | Database name | nit_itvms |
-| `DB_USER` | Database user | - |
-| `DB_PASSWORD` | Database password | - |
-| `JWT_SECRET` | JWT secret key | - |
-| `JWT_EXPIRES_IN` | JWT expiration | 7d |
-| `FRONTEND_URL` | Frontend URL | http://localhost:3001 |
+## 🔧 Development Scripts
 
-## 🎯 Usage
+```bash
+# Local development
+npm run dev              # Start with local database
+npm run dev:railway      # Start with Railway database config
 
-1. **Login**: Use the authentication system to access the application
-2. **Dashboard**: View real-time statistics and analytics
-3. **Vehicle Management**: Add and manage university vehicles
-4. **Driver Management**: Manage driver information and assignments
-5. **Trip Management**: Schedule and track trips
-6. **Maintenance**: Track vehicle maintenance history
-7. **Reports**: Generate comprehensive reports
+# Production
+npm start                # Start production server (Railway)
+npm test                 # Run tests
+npm run build            # Build (no-op for this project)
+```
 
-## 🔐 Security Features
+## 🐛 Troubleshooting
 
-- JWT-based authentication
-- Password hashing with bcrypt
-- Input validation and sanitization
-- CORS configuration
-- Helmet.js for security headers
-- Rate limiting (can be added)
+### Local Development Issues
+1. **Database Connection Error**
+   - Check MySQL server is running
+   - Verify database credentials in `.env`
+   - Ensure database `nit_itvms` exists
 
-## 📱 Responsive Design
+2. **Port Already in Use**
+   - Change port in `.env` file
+   - Kill process: `netstat -ano | findstr :3000`
 
-The application is fully responsive and works on:
-- Desktop computers
-- Tablets
-- Mobile phones
+### Railway Deployment Issues
+1. **Build Failures**
+   - Check Railway build logs
+   - Ensure `package.json` is correct
+   - Verify `start` script points to `server-railway.js`
+
+2. **Database Issues**
+   - Check if MySQL service is running in Railway
+   - Verify environment variables are set
+   - Check deployment logs
+
+📖 **For complete Railway troubleshooting, see [DEPLOYMENT-RAILWAY.md](DEPLOYMENT-RAILWAY.md)**
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 🤝 Contributing
 
@@ -235,24 +256,34 @@ The application is fully responsive and works on:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 📞 Support
 
 For support and queries:
-- Email: [your-email@nit.ac.tz]
-- Phone: [your-phone-number]
-
-## 🏫 About NIT University
-
-Nelson Mandela African Institution of Science and Technology (NIT) Dar es Salaam is a leading institution of higher learning in Tanzania, committed to excellence in science, technology, and innovation.
+- **Email**: support@nit.ac.tz
+- **Phone**: +255 123 456 789
+- **Location**: NIT University, Dar es Salaam, Tanzania
+- **GitHub**: Create issues in the repository
 
 ---
 
-**PROJECT KALI** - Integrated Transport & Vehicle Management System  
-*Empowering efficient transport management for educational institutions*
-#   N I T - v e h i c l e s - i n s p e c t i o n  
- #   N I T - v e h i c l e s - i n s p e c t i o n  
+## 🎉 Choose Your Deployment Method
+
+### 🏠 **For Development & Testing**
+Use local development with your own MySQL database.
+
+### 🚂 **For Production** ⭐ **Recommended**
+Deploy to Railway for:
+- ✅ **Managed Database** - No database maintenance
+- ✅ **Automatic SSL** - Secure HTTPS by default  
+- ✅ **Zero Config** - Deploy in minutes
+- ✅ **Built-in Monitoring** - Health checks & logs
+- ✅ **Auto-scaling** - Handle traffic spikes
+- ✅ **Global CDN** - Fast content delivery
+
+**Deploy to Railway now:** [DEPLOYMENT-RAILWAY.md](DEPLOYMENT-RAILWAY.md) 🚀
+
+---
+
+**© 2023 NIT University Dar es Salaam. All rights reserved.**
+#   N I T - V e h i c l e - s y s t e m  
  
